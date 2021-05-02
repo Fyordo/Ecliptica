@@ -1,15 +1,14 @@
 <?php
 
 /* @var $this yii\web\View */
+/* @var $id string[] */
 
 $this->title = 'Chat Application';
 ?>
 <div class="site-index">
 
     <div class="jumbotron">
-        <h1>Добро пожаловать в чат Ecliptica!</h1>
-
-        <p class="lead">Залогинься, и ты будешь перенаправлен в меню чатов!</p>
+        <h1>This is chats page!</h1>
     </div>
 
     <div class="body-content">

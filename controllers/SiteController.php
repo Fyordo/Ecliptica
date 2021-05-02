@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\User;
+use app\models\users\Users;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -61,7 +63,33 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $session = Yii::$app->session;
+
+        if (!isset($session["user"])) return $this->render('index');
+
+        $this->redirect('/chat');
+
+        return null;
+    }
+
+    public function actionPage($id){
+        $page_owner = null;
+
+        $UserFromDB = Users::findOne($id);
+
+        if (isset($UserFromDB)){
+            $page_owner = [
+                'id' => $UserFromDB->attributes["id"],
+                'username' => $UserFromDB->attributes["name"],
+                'password' => $UserFromDB->attributes["password"],
+                'status' => $UserFromDB->attributes["status"]
+            ];
+        }
+
+
+        return $this->render('page', [
+            'page_owner' => $page_owner
+        ]);
     }
 
     /**
@@ -96,24 +124,6 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
     }
 
     /**
