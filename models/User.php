@@ -2,13 +2,14 @@
 
 namespace app\models;
 
-use app\models\users\Users;
+use app\models\databases\Users;
 use Yii;
 
 class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
 {
     public $id;
     public $username;
+    public $link;
     public $password;
     public $status;
 
@@ -24,11 +25,10 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
             $user = [
                 'id' => $UserFromDB->attributes["id"],
                 'username' => $UserFromDB->attributes["name"],
+                'link' => $UserFromDB->attributes["link"],
                 'password' => $UserFromDB->attributes["password"],
                 'status' => $UserFromDB->attributes["status"]
             ];
-
-            Yii::$app->session->set("user", $user);
 
             return new static($user);
 
@@ -42,7 +42,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public static function findIdentityByAccessToken($token, $type = null)
     {
         return null;
-    }
+    } // Не используется
 
     /**
      * Finds user by username
@@ -62,6 +62,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
             $user = [
                 'id' => $UserFromDB["id"],
                 'username' => $UserFromDB["name"],
+                'link' => $UserFromDB->attributes["link"],
                 'password' => $UserFromDB["password"],
                 'status' => $UserFromDB->attributes["status"]
             ];
@@ -70,6 +71,51 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
 
         }
         return null;
+    }
+
+    /**
+     * Finds user by link
+     *
+     * @param string $link
+     * @return static|null
+     */
+    public static function findByLink($link)
+    {
+
+        $UserFromDB = Users::find()->where([
+            "link" => $link
+        ])->one();
+
+        if (isset($UserFromDB)){
+
+            $user = [
+                'id' => $UserFromDB["id"],
+                'username' => $UserFromDB["name"],
+                'link' => $UserFromDB->attributes["link"],
+                'password' => $UserFromDB["password"],
+                'status' => $UserFromDB->attributes["status"]
+            ];
+
+            return new static($user);
+
+        }
+        return null;
+    }
+
+    /**
+     * Returns 1, if user, and 0, if chat
+     *
+     * @param string $link
+     * @return int
+     */
+    public static function IsUser($link) : int
+    {
+
+        $UserFromDB = Users::find()->where([
+            "link" => $link
+        ])->one();
+
+        return isset($UserFromDB) ? 1 : 0;
     }
 
     /**
@@ -85,16 +131,16 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->authKey;
-    }
+        return null;
+    } // Не используется
 
     /**
      * {@inheritdoc}
      */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
-    }
+        return true;
+    } // Не используется
 
     /**
      * Validates password

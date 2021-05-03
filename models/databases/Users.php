@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\models\users;
+namespace app\models\databases;
 
 use yii\db\ActiveRecord;
 

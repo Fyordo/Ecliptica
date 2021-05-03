@@ -74,6 +74,7 @@ class LoginForm extends Model
     {
         if ($this->_user === false) {
             $this->_user = User::findByUsername($this->username);
+            Yii::$app->session->set('user', $this->_user);
         }
 
         return $this->_user;

@@ -3,6 +3,8 @@
 /* @var $this yii\web\View */
 /* @var $page_owner string[] */
 
+use yii\helpers\Html;
+
 $user = Yii::$app->session["user"];
 $this->title = 'Chat Application';
 
@@ -19,11 +21,13 @@ $this->title = 'Chat Application';
                 <p class="lead">ID = ' . $page_owner["id"] . '</p>
                 ';
 
-                if ($page_owner["id"] != $user["id"]){
+                if ($page_owner["id"] != $user->id){
                     echo "<p class='lead'>И это не твоя страница!</p>";
                 }
                 else{
                     echo "<p class='lead'>И это твоя страница!</p>";
+                    echo Html::beginForm(['/logout'], 'post') .
+                        Html::submitButton('Logout', ['class' => 'btn btn-link logout']) . Html::endForm();
                 }
             }
         ?>
