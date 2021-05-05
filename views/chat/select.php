@@ -1,9 +1,12 @@
 <?php
 
+use app\models\classes\MessageClass;
+
 /* @var $this yii\web\View */
 /* @var $chat app\models\classes\ChatClass */
+/* @var $messages array */
 
-$this->title = 'Chat Application';
+$this->title = $chat->title;
 ?>
 <div class="site-index">
 
@@ -17,7 +20,7 @@ $this->title = 'Chat Application';
 
     <div class="body-content">
 
-
+        <?= MessageClass::ConstructMessagesBox($messages); ?>
 
     </div>
 </div>

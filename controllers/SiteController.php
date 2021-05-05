@@ -56,7 +56,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * Домашняя страница
      *
      * @return string
      */
@@ -92,7 +92,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Login action.
+     * Страница авторизации
      *
      * @return Response|string
      */
@@ -114,7 +114,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Logout action.
+     * Страница выхода
      *
      * @return Response
      */
@@ -126,7 +126,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays about page.
+     * Страница "о нас"
      *
      * @return string
      */
