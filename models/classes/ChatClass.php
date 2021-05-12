@@ -25,7 +25,7 @@ class ChatClass
     }
 
     /**
-     * Finds chat by ID
+     * Находит чат по ID
      *
      * @param $id
      * @return ChatClass

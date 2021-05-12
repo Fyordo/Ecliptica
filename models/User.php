@@ -45,7 +45,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     } // Не используется
 
     /**
-     * Finds user by username
+     * Находит пользователя по имени
      *
      * @param string $username
      * @return static|null
@@ -60,10 +60,10 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         if (isset($UserFromDB)){
 
             $user = [
-                'id' => $UserFromDB["id"],
-                'username' => $UserFromDB["name"],
+                'id' => $UserFromDB->attributes["id"],
+                'username' => $UserFromDB->attributes["name"],
                 'link' => $UserFromDB->attributes["link"],
-                'password' => $UserFromDB["password"],
+                'password' => $UserFromDB->attributes["password"],
                 'status' => $UserFromDB->attributes["status"]
             ];
 
@@ -74,7 +74,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     }
 
     /**
-     * Finds user by link
+     * Находит пользователя по ссылке
      *
      * @param string $link
      * @return static|null
@@ -89,10 +89,10 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         if (isset($UserFromDB)){
 
             $user = [
-                'id' => $UserFromDB["id"],
-                'username' => $UserFromDB["name"],
+                'id' => $UserFromDB->attributes["id"],
+                'username' => $UserFromDB->attributes["name"],
                 'link' => $UserFromDB->attributes["link"],
-                'password' => $UserFromDB["password"],
+                'password' => $UserFromDB->attributes["password"],
                 'status' => $UserFromDB->attributes["status"]
             ];
 
@@ -103,7 +103,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     }
 
     /**
-     * Returns 1, if user, and 0, if chat
+     * Возращает 1, если пользователь, и 0, если чат
      *
      * @param string $link
      * @return int

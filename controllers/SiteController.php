@@ -80,11 +80,11 @@ class SiteController extends Controller
             $page_owner = [
                 'id' => $UserFromDB->attributes["id"],
                 'username' => $UserFromDB->attributes["name"],
+                'link' => $UserFromDB->attributes["link"],
                 'password' => $UserFromDB->attributes["password"],
                 'status' => $UserFromDB->attributes["status"]
             ];
         }
-
 
         return $this->render('page', [
             'page_owner' => $page_owner
@@ -111,6 +111,10 @@ class SiteController extends Controller
         return $this->render('login', [
             'model' => $model,
         ]);
+    }
+
+    public function actionApi(){
+        return $this->render("api");
     }
 
     /**

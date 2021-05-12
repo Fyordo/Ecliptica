@@ -7,7 +7,7 @@
 
 use yii\helpers\Html;
 
-$this->title = $name;
+$this->title = 'Упс...';
 ?>
 <div class="site-error">
 

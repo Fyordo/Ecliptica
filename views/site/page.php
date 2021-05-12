@@ -2,11 +2,12 @@
 
 /* @var $this yii\web\View */
 /* @var $page_owner string[] */
+/* @var $user \app\models\User */
 
 use yii\helpers\Html;
 
 $user = Yii::$app->session["user"];
-$this->title = 'Chat Application';
+$this->title = $user->username;
 
 ?>
 <div class="site-index">

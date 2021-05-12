@@ -4,13 +4,15 @@
 namespace app\models\classes;
 
 
+use app\models\databases\Chats;
 use app\models\databases\Messages;
 use app\models\User;
+use Yii;
 
 class MessageClass
 {
     public int $id; // ID сообщения
-    public string $user; // Link отправителя
+    public string $userlink; // Link отправителя
     public string $username; // Ник отправителя
     public string $text; // Текст сообщения
     public string $time; // Время отправки
@@ -23,7 +25,7 @@ class MessageClass
         }
 
         $this->id = $message["id"];
-        $this->user = $message["user"];
+        $this->userlink = $message["userlink"];
         $this->username = $message["username"];
         $this->text = $message["text"];
         $this->time = $message["time"];
@@ -47,8 +49,8 @@ class MessageClass
         foreach ($MessagesFromDB as $message){
             $message = [
                 'id' => $message->attributes["id"],
-                'user' => $message->attributes["user"],
-                'username' => User::findByLink($message->attributes["user"])->username,
+                'userlink' => $message->attributes["userlink"],
+                'username' => $message->attributes["username"],
                 'text' => $message->attributes["text"],
                 'time' => $message->attributes["time"],
                 'chatLink' => $chatLink
@@ -79,5 +81,23 @@ class MessageClass
         }
 
         return $MessagesBox;
+    }
+
+    private static function GetLastID(){
+        $lastMessage = Messages::find()->orderBy(['id' => SORT_DESC])->one();
+        return $lastMessage->attributes["id"];
+    }
+
+    public static function AddMessage($chatlink, $text){
+        $message = new Messages();
+        $user = Yii::$app->session["user"];
+        $message->id = self::GetLastID()+1;
+        $message->userlink = $user->link;
+        $message->username = $user->username;
+        $message->text = $text;
+        $message->time = date("H:i Y-m-d");
+        $message->chatlink = $chatlink;
+        $message->save();
+
     }
 }

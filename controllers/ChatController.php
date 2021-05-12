@@ -22,12 +22,25 @@ class ChatController extends Controller
         ]);
     }
 
-    function actionSelect(string $link = null){
+    function actionSelect($link = null){
+
         $messages = MessageClass::FindMessagesFromChat($link);
+        /*
+        return $this->render('select', [
+            'chat' => ChatClass::FindChatByLink($link, User::IsUser($link)),
+            'messages' => $messages
+        ]);
+        */
+        $session = Yii::$app->session;
+        $_COOKIE["login"] = $session["user"]->username;
+
+        //$this->redirect("http://localhost:3000");
 
         return $this->render('select', [
             'chat' => ChatClass::FindChatByLink($link, User::IsUser($link)),
             'messages' => $messages
         ]);
+
+
     }
 }

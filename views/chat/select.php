@@ -23,4 +23,5 @@ $this->title = $chat->title;
         <?= MessageClass::ConstructMessagesBox($messages); ?>
 
     </div>
+
 </div>
