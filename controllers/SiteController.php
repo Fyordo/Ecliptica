@@ -62,9 +62,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $session = Yii::$app->session;
-
-        if (!isset($session["user"])) return $this->render('index');
+        if (Yii::$app->user->isGuest) return $this->render('index');
 
         $this->redirect('/chat');
 

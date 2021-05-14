@@ -6,7 +6,7 @@
 
 use yii\helpers\Html;
 
-$user = Yii::$app->session["user"];
+$user = Yii::$app->user->identity;
 $this->title = $user->username;
 
 ?>

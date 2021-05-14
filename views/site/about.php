@@ -11,8 +11,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        This is the About page. You may modify the following file to customize its content:
+        Так, ну это, как бы так сказать. Это очень кривой чат, который если заработает, то я буду в шоке.<br>
+        На данный момент тут нельзя зарегаться, сообщения то перемещаются в будущее, то остаются в прошлом.<br>
+        В общем, всё работает через жопу.<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        .<br>
+        Но это пока что...<br>
     </p>
-
-    <code><?= __FILE__ ?></code>
 </div>

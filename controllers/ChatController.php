@@ -14,11 +14,9 @@ use yii\web\Controller;
 class ChatController extends Controller
 {
     function actionIndex(){
-        $session = Yii::$app->session;
-
         return $this->render('index', [
-            'user' => $session["user"],
-            'chats' => ChatClass::GetChatsList($session["user"]->id)
+            'user' => Yii::$app->user->identity,
+            'chats' => ChatClass::GetChatsList(Yii::$app->user->id)
         ]);
     }
 
@@ -31,8 +29,6 @@ class ChatController extends Controller
             'messages' => $messages
         ]);
         */
-        $session = Yii::$app->session;
-        $_COOKIE["login"] = $session["user"]->username;
 
         //$this->redirect("http://localhost:3000");
 
@@ -42,5 +38,9 @@ class ChatController extends Controller
         ]);
 
 
+    }
+
+    function actionSend(){
+        return $this->render('send');
     }
 }

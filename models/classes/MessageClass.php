@@ -77,7 +77,7 @@ class MessageClass
         }
 
         if (count($messages) == 0){
-            return '<h3 align="center">Здесь пока нет сообщений</h3><br>';
+            return '<h3 id="nomess" align="center">Здесь пока нет сообщений</h3><br>';
         }
 
         return $MessagesBox;
@@ -88,14 +88,14 @@ class MessageClass
         return $lastMessage->attributes["id"];
     }
 
-    public static function AddMessage($chatlink, $text){
+    public static function AddMessage($chatlink, $text, $time){
         $message = new Messages();
-        $user = Yii::$app->session["user"];
+        $user = Yii::$app->user->identity;
         $message->id = self::GetLastID()+1;
         $message->userlink = $user->link;
         $message->username = $user->username;
         $message->text = $text;
-        $message->time = date("H:i Y-m-d");
+        $message->time = $time;
         $message->chatlink = $chatlink;
         $message->save();
 
