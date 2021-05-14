@@ -88,9 +88,9 @@ class MessageClass
         return $lastMessage->attributes["id"];
     }
 
-    public static function AddMessage($chatlink, $text, $time){
+    public static function AddMessage($chatlink, $text, $time, $user = null){
         $message = new Messages();
-        $user = Yii::$app->user->identity;
+        $user = $user == null ? Yii::$app->user->identity : $user;
         $message->id = self::GetLastID()+1;
         $message->userlink = $user->link;
         $message->username = $user->username;

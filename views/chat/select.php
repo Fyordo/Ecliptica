@@ -1,11 +1,13 @@
 <?php
 
 use app\models\classes\MessageClass;
+use app\models\User;
+use app\models\classes\ChatClass;
 
 /* @var $this yii\web\View */
-/* @var $chat app\models\classes\ChatClass */
+/* @var $chat ChatClass */
 /* @var $messages array */
-/* @var $user \app\models\User */
+/* @var $user User */
 
 $this->title = $chat->title;
 $user = Yii::$app->user->identity;
@@ -54,8 +56,8 @@ $user = Yii::$app->user->identity;
             event.preventDefault();
 
             if ($textarea.val() !== ""){
-                $nomess.remove();
-                socket.emit('send mess', {mess: $textarea.val(), name: "<?= $user->username ?>", time: "<?= date("H:i d.m.Y") ?>"});
+
+                socket.emit('send mess', {mess: $textarea.val(), name: "<?= $user->username ?>", senderlink: "<?= $user->link ?>", time: "<?= date("H:i d.m.Y") ?>", chat: "<?= $chat->link ?>"});
             }
 
             $textarea.val('');
@@ -63,25 +65,56 @@ $user = Yii::$app->user->identity;
 
 
         socket.on('add mess', function(data) {
-            $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
-            $.ajax({
-                type: 'POST',
-                url: "http://ecliptica/chat/send",
-                data: {
-                    "user": "<?= $user->link ?>",
-                    "message": data.mess,
-                    "chat": "<?= $chat->link ?>",
-                    "time": data.time,
-                    "isDirect": <?=$chat->status == 1 ? "true" : "false"?>
-                },
-                dataType: 'text',
-                success: function(data){
+            /*
+            data.chat - чат, в который отправляется сообщение
+            data.time - время отправки
+            data.name - имя отправителя
+            data.senderlink - ссылка отправителя
+            data.mess - текст сообщения
+            */
+            if (data.senderlink === "<?= $chat->link ?>"){ // добавление сообщения по ту сторону директа
+                $nomess.remove();
+                $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
+                $.ajax({
+                    type: 'POST',
+                    url: "http://ecliptica/chat/send",
+                    data: {
+                        "user": data.senderlink,
+                        "message": data.mess,
+                        "chat": "<?= $chat->link ?>",
+                        "time": data.time,
+                    },
+                    dataType: 'text',
+                    success: function(data){
 
-                },
-                error: function(data){
-                    console.log(data);
-                }
-            });
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+            }
+
+            if (data.chat === "<?= $chat->link ?>"){ // добавление сообщения самому себе и всему чату
+                $nomess.remove();
+                $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
+                $.ajax({
+                    type: 'POST',
+                    url: "http://ecliptica/chat/send",
+                    data: {
+                        "user": null,
+                        "message": data.mess,
+                        "chat": "<?= $chat->link ?>",
+                        "time": data.time,
+                    },
+                    dataType: 'text',
+                    success: function(data){
+
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+            }
         });
     });
 </script>
