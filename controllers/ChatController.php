@@ -15,7 +15,6 @@ class ChatController extends Controller
 {
     function actionIndex(){
         return $this->render('index', [
-            'user' => Yii::$app->user->identity,
             'chats' => ChatClass::GetChatsList(Yii::$app->user->id)
         ]);
     }
@@ -23,14 +22,6 @@ class ChatController extends Controller
     function actionSelect($link = null){
 
         $messages = MessageClass::FindMessagesFromChat($link);
-        /*
-        return $this->render('select', [
-            'chat' => ChatClass::FindChatByLink($link, User::IsUser($link)),
-            'messages' => $messages
-        ]);
-        */
-
-        //$this->redirect("http://localhost:3000");
 
         return $this->render('select', [
             'chat' => ChatClass::FindChatByLink($link, User::IsUser($link)),
@@ -42,5 +33,22 @@ class ChatController extends Controller
 
     function actionSend(){
         return $this->render('send');
+    }
+
+    function actionFindchat(){
+        return $this->render('findchat');
+    }
+
+    function actionCreate(){
+        return $this->render('create');
+    }
+
+    function actionCreatechat(){
+        return $this->render('createchat');
+    }
+
+    function actionExitchat(){
+        ChatClass::RemoveUserFromChat($_GET["link"]);
+        return $this->redirect('/');
     }
 }

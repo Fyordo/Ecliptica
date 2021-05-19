@@ -9,35 +9,39 @@ use app\models\classes\ChatClass;
 /* @var $messages array */
 /* @var $user User */
 
-$this->title = $chat->title;
+$this->title = $chat->title == null ? "Чат не найден" : $chat->title;
 $user = Yii::$app->user->identity;
+
 ?>
 <div class="site-index">
 
     <div class="jumbotron">
-        <?php if ($chat->status != -1): ?>
-            <h1><?= $chat->status == 1 ? 'Директ с ' : 'Чат: ' ?> <?= $chat->title ?></h1>
+        <?php if ($chat->title != ""): ?>
+            <h1><?= 'Чат: ' ?> <?= $chat->title ?></h1>
+            <a href="exitchat?link=<?= $chat->link ?>">Выйти</a>
         <?php else: ?>
             <h1>Такого чата нет!</h1>
         <?php endif; ?>
     </div>
+    <?php if ($chat->title != ""): ?>
 
-    <div id="all_mess" class="body-content">
+        <div id="all_mess" class="body-content">
 
-        <?= MessageClass::ConstructMessagesBox($messages); ?>
+            <?= MessageClass::ConstructMessagesBox($messages); ?>
 
-    </div>
+        </div>
 
-    <form id="messForm">
-        <textarea name="message" id="message" class="form-control" placeholder="Введите сообщение"></textarea>
-        <br>
-        <input id="send" type="submit" value="Отправить" class="btn btn-primary">
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-    </form>
+        <form id="messForm">
+            <textarea name="message" id="message" class="form-control" placeholder="Введите сообщение"></textarea>
+            <br>
+            <input id="send" type="submit" value="Отправить" class="btn btn-primary">
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+        </form>
+    <?php endif; ?>
 
 </div>
 
@@ -50,14 +54,14 @@ $user = Yii::$app->user->identity;
         let $form = $("#messForm"); // Форму сообщений
         let $textarea = $("#message"); // Текстовое поле
         let $all_messages = $("#all_mess"); // Блок с сообщениями
-        let $nomess = $("#nomess"); // Блок с сообщениями
+        let $nomess = $("#nomess"); // Надпись "сообщений нет"
 
         $form.submit(function(event) {
             event.preventDefault();
 
             if ($textarea.val() !== ""){
 
-                socket.emit('send mess', {mess: $textarea.val(), name: "<?= $user->username ?>", senderlink: "<?= $user->link ?>", time: "<?= date("H:i d.m.Y") ?>", chat: "<?= $chat->link ?>"});
+                socket.emit('send mess', {mess: $textarea.val(), name: "<?= $user->username ?>", chat: "<?= $chat->link ?>"});
             }
 
             $textarea.val('');
@@ -65,36 +69,16 @@ $user = Yii::$app->user->identity;
 
 
         socket.on('add mess', function(data) {
+
             /*
             data.chat - чат, в который отправляется сообщение
             data.time - время отправки
             data.name - имя отправителя
-            data.senderlink - ссылка отправителя
             data.mess - текст сообщения
             */
-            if (data.senderlink === "<?= $chat->link ?>"){ // добавление сообщения по ту сторону директа
-                $nomess.remove();
-                $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
-                $.ajax({
-                    type: 'POST',
-                    url: "http://ecliptica/chat/send",
-                    data: {
-                        "user": data.senderlink,
-                        "message": data.mess,
-                        "chat": "<?= $chat->link ?>",
-                        "time": data.time,
-                    },
-                    dataType: 'text',
-                    success: function(data){
 
-                    },
-                    error: function(data){
-                        console.log(data);
-                    }
-                });
-            }
-
-            if (data.chat === "<?= $chat->link ?>"){ // добавление сообщения самому себе и всему чату
+            // добавление сообщения самому себе и всему чату
+            if (data.chat === "<?= $chat->link ?>"){
                 $nomess.remove();
                 $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
                 $.ajax({
@@ -108,10 +92,10 @@ $user = Yii::$app->user->identity;
                     },
                     dataType: 'text',
                     success: function(data){
-
+                        console.log("Отправлено");
                     },
                     error: function(data){
-                        console.log(data);
+                        console.log("Ошибка");
                     }
                 });
             }

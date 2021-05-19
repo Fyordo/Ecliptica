@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\databases\Chats;
 use app\models\databases\Users;
 use Yii;
 
@@ -151,6 +152,11 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public function validatePassword($password)
     {
         return $this->password === $password;
+    }
+
+    public static function GetLastID(){
+        $lastUser = Users::find()->orderBy(['id' => SORT_DESC])->one();
+        return $lastUser->attributes["id"];
     }
 }
 

@@ -54,6 +54,8 @@ $config = [
                 'logout' => 'site/logout',
                 'chat' => 'chat/index',
                 'page' => 'site/page',
+                'create' => 'chat/create',
+                'register' => 'site/register',
             ],
         ],
     ],

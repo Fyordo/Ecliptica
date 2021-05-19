@@ -39,11 +39,20 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'About', 'url' => ['/about']],
+
+            ['label' => 'О нас', 'url' => ['/about']],
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/login']]
+                ['label' => 'Войти', 'url' => ['/login']]
             ) : (
                 '<li>'
+                . Html::beginForm(['/create'], 'post')
+                . Html::submitButton(
+                    "Создать чат",
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>'
+                . '<li>'
                 . Html::beginForm(['/page?id=' . $user->id], 'post')
                 . Html::submitButton(
                     Yii::$app->user->identity->username,

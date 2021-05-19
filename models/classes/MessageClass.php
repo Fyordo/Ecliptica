@@ -6,8 +6,10 @@ namespace app\models\classes;
 
 use app\models\databases\Chats;
 use app\models\databases\Messages;
+use app\models\databases\UserChats;
 use app\models\User;
 use Yii;
+use yii\base\BaseObject;
 
 class MessageClass
 {
@@ -100,4 +102,6 @@ class MessageClass
         $message->save();
 
     }
+
+
 }

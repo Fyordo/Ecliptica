@@ -5,23 +5,25 @@ namespace app\models\classes;
 use app\models\databases\Chats;
 use app\models\databases\UserChats;
 use app\models\User;
+use phpDocumentor\Reflection\Types\This;
+use Yii;
+use yii\base\BaseObject;
+use yii\debug\panels\EventPanel;
 
 class ChatClass
 {
     public int $id = -1; // ID чата
     public string $title = ''; // Название чата
     public string $link = ''; // Уникальная ссылка чата
-    public int $status = -1; // Статус чата
 
     public function __construct($chatAsArray){
 
-        if ($chatAsArray == null){
+        if ($chatAsArray["id"] == null){
             return;
         }
         $this->id = $chatAsArray["id"];
         $this->title = $chatAsArray["title"];
         $this->link = $chatAsArray["link"];
-        $this->status = $chatAsArray["status"];
     }
 
     /**
@@ -30,26 +32,14 @@ class ChatClass
      * @param $id
      * @return ChatClass
      */
-    public static function FindChatByID($id, $status = 0): ChatClass
+    public static function FindChatByID($id): ChatClass
     {
-        if ($status == 0){
-            $ChatFromDB = Chats::findOne($id);
-            $chat = [
-                'id' => $ChatFromDB->attributes["id"],
-                'title' => $ChatFromDB->attributes["title"],
-                'link' => $ChatFromDB->attributes["link"],
-                'status' => 0
-            ];
-        }
-        else{
-            $UserFromDB = User::findIdentity($id);
-            $chat = [
-                'id' => $UserFromDB["id"],
-                'title' => $UserFromDB["username"],
-                'link' => $UserFromDB["link"],
-                'status' => 1
-            ];
-        }
+        $ChatFromDB = Chats::findOne($id);
+        $chat = [
+            'id' => $ChatFromDB->attributes["id"],
+            'title' => $ChatFromDB->attributes["title"],
+            'link' => $ChatFromDB->attributes["link"],
+        ];
 
         return new ChatClass($chat);
     }
@@ -58,31 +48,20 @@ class ChatClass
      * Finds chat by Link
      *
      * @param $link
-     * @return ChatClass
+     * @return ChatClass|null
      */
-    public static function FindChatByLink($link, $status = 0): ChatClass
+    public static function FindChatByLink($link): ChatClass
     {
-        if ($status == 0) { // Поиск чата
-            $ChatFromDB = Chats::find()->where([
-                "link" => $link
-            ])->one();
+        $ChatFromDB = Chats::find()->where([
+            "link" => $link
+        ])->one();
 
-            $chat = [
-                'id' => $ChatFromDB->attributes["id"],
-                'title' => $ChatFromDB->attributes["title"],
-                'link' => $link,
-                'status' => 0
-            ];
-        }
-        else{ // Поиск пользователя
-            $UserFromDB = User::findByLink($link);
-            $chat = [
-                'id' => $UserFromDB->id,
-                'title' => $UserFromDB->username,
-                'link' => $link,
-                'status' => 1
-            ];
-        }
+        $chat = [
+            'id' => $ChatFromDB->attributes["id"],
+            'title' => $ChatFromDB->attributes["title"],
+            'link' => $link,
+            'status' => 0
+        ];
         return new ChatClass($chat);
     }
 
@@ -92,29 +71,18 @@ class ChatClass
      * @param $title
      * @return ChatClass
      */
-    public static function FindChatByTitle($title, $status = 0): ChatClass
+    public static function FindChatByTitle($title): ChatClass
     {
         $ChatFromDB = Chats::find()->where([
             "title" => $title
         ])->one();
 
-        if ($status == 0) {
-            $chat = [
-                'id' => $ChatFromDB->attributes["id"],
-                'title' => $ChatFromDB->attributes["title"],
-                'link' => $ChatFromDB->attributes["link"],
-                'status' => 0
-            ];
-        }
-        else{
-            $UserFromDB = User::findByUsername($title);
-            $chat = [
-                'id' => $UserFromDB["id"],
-                'title' => $UserFromDB["username"],
-                'link' => $UserFromDB["link"],
-                'status' => 1
-            ];
-        }
+        $chat = [
+            'id' => $ChatFromDB->attributes["id"],
+            'title' => $ChatFromDB->attributes["title"],
+            'link' => $ChatFromDB->attributes["link"],
+            'status' => 0
+        ];
 
         return new ChatClass($chat);
     }
@@ -130,7 +98,7 @@ class ChatClass
         $chats = [];
 
         foreach ($chatsList as $CurrChat){
-            if ($CurrChat->attributes["status"] == 1) $chat = ChatClass::FindChatByLink($CurrChat->attributes["chat_link"], 1);
+            if ($CurrChat->attributes["status"] == 1) $chat = ChatClass::FindChatByLink($CurrChat->attributes["chat_link"]);
             else $chat = ChatClass::FindChatByLink($CurrChat->attributes["chat_link"]);
 
             array_push($chats, $chat);
@@ -146,22 +114,49 @@ class ChatClass
      */
     public static function ConstructChat($chat){
         $ChatBox = '
-        <a href="chat/select?link=' . $chat->link . '">
-            <div class="col-lg-4">
-                <h2>' . $chat->title . ' (' . $chat->link . ') </h2>';
-        if ($chat->status === 1){
-            $ChatBox .= '<p>  Директ</p>';
-        }
-        else{
-            $ChatBox .= '<p>  Общий чат</p>';
-        }
-
-        $ChatBox .= '</div></a>';
+        <div class="col-lg-4">
+            <a href="chat/select?link=' . $chat->link . '">
+                    <h2>' . $chat->title . ' (' . $chat->link . ') </h2>
+            </a>
+            
+        </div>
+        ';
 
         return $ChatBox;
     }
 
-    public function GetMessages(){
+    private static function GetLastID(){
+        $lastChat = Chats::find()->orderBy(['id' => SORT_DESC])->one();
+        return $lastChat->attributes["id"];
+    }
 
+    public static function CreateChat($title, $link){
+        if (!Chats::find()->where(["link" => $link])->exists()){
+            $chat = new Chats();
+            $chat->id = ChatClass::GetLastID() + 1;
+            $chat->title = $title;
+            $chat->link = $link;
+            $chat->save();
+
+            ChatClass::AddChat($link, \Yii::$app->user->id);
+
+        }
+
+    }
+
+    public static function AddChat($chatlink, $userID){
+        $chat = ChatClass::FindChatByLink($chatlink);
+        if (!UserChats::find()->where(["user_id" => $userID, "chat_link" => $chatlink])->exists() && $chat->title != ""){
+            $chat = new UserChats();
+            $chat->user_id = $userID;
+            $chat->chat_link = $chatlink;
+            $chat->save();
+        }
+    }
+
+    public static function RemoveUserFromChat($link){
+        if (UserChats::find()->where(["user_id" => \Yii::$app->user->id, "chat_link" => $link])->exists()){
+            Yii::$app->db->createCommand('DELETE FROM `user_chats` WHERE `user_id` = '. \Yii::$app->user->id .' AND `chat_link` = "'. $link .'"')->execute();
+        }
     }
 }
