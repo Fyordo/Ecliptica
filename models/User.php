@@ -12,7 +12,6 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public $username;
     public $link;
     public $password;
-    public $status;
 
     /**
      * {@inheritdoc}
@@ -28,7 +27,6 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                 'username' => $UserFromDB->attributes["name"],
                 'link' => $UserFromDB->attributes["link"],
                 'password' => $UserFromDB->attributes["password"],
-                'status' => $UserFromDB->attributes["status"]
             ];
 
             return new static($user);
@@ -65,7 +63,6 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                 'username' => $UserFromDB->attributes["name"],
                 'link' => $UserFromDB->attributes["link"],
                 'password' => $UserFromDB->attributes["password"],
-                'status' => $UserFromDB->attributes["status"]
             ];
 
             return new static($user);
@@ -94,7 +91,6 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                 'username' => $UserFromDB->attributes["name"],
                 'link' => $UserFromDB->attributes["link"],
                 'password' => $UserFromDB->attributes["password"],
-                'status' => $UserFromDB->attributes["status"]
             ];
 
             return new static($user);
@@ -154,6 +150,11 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         return $this->password === $password;
     }
 
+    /**
+     * Последний ID в БД
+     *
+     * @return mixed
+     */
     public static function GetLastID(){
         $lastUser = Users::find()->orderBy(['id' => SORT_DESC])->one();
         return $lastUser->attributes["id"];

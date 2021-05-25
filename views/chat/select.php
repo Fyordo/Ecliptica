@@ -8,12 +8,22 @@ use app\models\classes\ChatClass;
 /* @var $chat ChatClass */
 /* @var $messages array */
 /* @var $user User */
+/* @var $isadmin bool */
 
 $this->title = $chat->title == null ? "Чат не найден" : $chat->title;
 $user = Yii::$app->user->identity;
 
 ?>
 <div class="site-index">
+    <?php if ($isadmin): ?>
+
+        <div class="row">
+            <input name="userLink" id="userLink" class="form-control" placeholder="Дать доступ к сообщениям"></input>
+            <br>
+            <input id="set" type="submit" value="Поиск" class="btn btn-primary">
+            <br>
+        </div>
+    <?php endif; ?>
 
     <div class="jumbotron">
         <?php if ($chat->title != ""): ?>
@@ -26,21 +36,23 @@ $user = Yii::$app->user->identity;
     <?php if ($chat->title != ""): ?>
 
         <div id="all_mess" class="body-content">
-
             <?= MessageClass::ConstructMessagesBox($messages); ?>
-
         </div>
 
-        <form id="messForm">
-            <textarea name="message" id="message" class="form-control" placeholder="Введите сообщение"></textarea>
-            <br>
-            <input id="send" type="submit" value="Отправить" class="btn btn-primary">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-        </form>
+        <?php if ($isadmin): ?>
+
+
+            <form id="messForm">
+                <textarea name="message" id="message" class="form-control" placeholder="Введите сообщение"></textarea>
+                <br>
+                <input id="send" type="submit" value="Отправить" class="btn btn-primary">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+            </form>
+        <?php endif; ?>
     <?php endif; ?>
 
 </div>
@@ -98,6 +110,27 @@ $user = Yii::$app->user->identity;
                         console.log("Ошибка");
                     }
                 });
+            }
+        });
+    });
+</script>
+<script>
+    let textarea = $("#userLink"); // Ссылка на пользователя
+
+    $(document).on("click", "#set", function() {
+        $.ajax({
+            type: 'POST',
+            url: "http://ecliptica/chat/addadmin",
+            data: {
+                "userID": textarea.val(),
+                "chatLink": "<?= $chat->link ?>",
+            },
+            dataType: 'text',
+            success: function (data) {
+                alert("Пользователю даны права админа");
+            },
+            error: function (data) {
+                console.log("Ошибка");
             }
         });
     });

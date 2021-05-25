@@ -35,7 +35,7 @@ class MessageClass
     }
 
     /**
-     * Находит все сообщения из чата ChatLink
+     * Находит все сообщения из чата
      *
      * @param $chatLink
      * @return array
@@ -65,7 +65,7 @@ class MessageClass
     }
 
     /**
-     * Сделать форму с сообщениями
+     * Вывести все сообщения
      *
      * @param $messages
      * @return string
@@ -85,11 +85,24 @@ class MessageClass
         return $MessagesBox;
     }
 
+    /**
+     * Вернуть последний ID сообщения из БД
+     *
+     * @return mixed
+     */
     private static function GetLastID(){
         $lastMessage = Messages::find()->orderBy(['id' => SORT_DESC])->one();
         return $lastMessage->attributes["id"];
     }
 
+    /**
+     * Отправить сообщение и добавить в БД
+     *
+     * @param $chatlink
+     * @param $text
+     * @param $time
+     * @param null $user
+     */
     public static function AddMessage($chatlink, $text, $time, $user = null){
         $message = new Messages();
         $user = $user == null ? Yii::$app->user->identity : $user;

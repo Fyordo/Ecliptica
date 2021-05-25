@@ -27,25 +27,7 @@ class ChatClass
     }
 
     /**
-     * Находит чат по ID
-     *
-     * @param $id
-     * @return ChatClass
-     */
-    public static function FindChatByID($id): ChatClass
-    {
-        $ChatFromDB = Chats::findOne($id);
-        $chat = [
-            'id' => $ChatFromDB->attributes["id"],
-            'title' => $ChatFromDB->attributes["title"],
-            'link' => $ChatFromDB->attributes["link"],
-        ];
-
-        return new ChatClass($chat);
-    }
-
-    /**
-     * Finds chat by Link
+     * Найти чат по ссылке
      *
      * @param $link
      * @return ChatClass|null
@@ -66,29 +48,7 @@ class ChatClass
     }
 
     /**
-     * Finds chat by Title
-     *
-     * @param $title
-     * @return ChatClass
-     */
-    public static function FindChatByTitle($title): ChatClass
-    {
-        $ChatFromDB = Chats::find()->where([
-            "title" => $title
-        ])->one();
-
-        $chat = [
-            'id' => $ChatFromDB->attributes["id"],
-            'title' => $ChatFromDB->attributes["title"],
-            'link' => $ChatFromDB->attributes["link"],
-            'status' => 0
-        ];
-
-        return new ChatClass($chat);
-    }
-
-    /**
-     * Finds all chats, where user is added
+     * Найти все чаты из списка пользователя
      *
      * @param $UserID
      * @return array
@@ -98,8 +58,7 @@ class ChatClass
         $chats = [];
 
         foreach ($chatsList as $CurrChat){
-            if ($CurrChat->attributes["status"] == 1) $chat = ChatClass::FindChatByLink($CurrChat->attributes["chat_link"]);
-            else $chat = ChatClass::FindChatByLink($CurrChat->attributes["chat_link"]);
+            $chat = ChatClass::FindChatByLink($CurrChat->attributes["chat_link"]);
 
             array_push($chats, $chat);
         }
@@ -107,7 +66,7 @@ class ChatClass
     }
 
     /**
-     * Constructs chat form
+     * Создать ячейку с чатом
      *
      * @param $chat
      * @return string
@@ -125,11 +84,22 @@ class ChatClass
         return $ChatBox;
     }
 
+    /**
+     * Получить последний ID чатов из существующих
+     *
+     * @return mixed
+     */
     private static function GetLastID(){
         $lastChat = Chats::find()->orderBy(['id' => SORT_DESC])->one();
         return $lastChat->attributes["id"];
     }
 
+    /**
+     * Создаёт чат, проверив ссылку
+     *
+     * @param $title
+     * @param $link
+     */
     public static function CreateChat($title, $link){
         if (!Chats::find()->where(["link" => $link])->exists()){
             $chat = new Chats();
@@ -138,25 +108,72 @@ class ChatClass
             $chat->link = $link;
             $chat->save();
 
-            ChatClass::AddChat($link, \Yii::$app->user->id);
+            ChatClass::AddChat($link, \Yii::$app->user->id, 1);
 
         }
 
     }
 
-    public static function AddChat($chatlink, $userID){
+    /**
+     * Добавляет чат в списки к пользователю
+     *
+     * @param $chatlink
+     * @param $userID
+     * @param $isadmin
+     */
+    public static function AddChat($chatlink, $userID, $isadmin){
         $chat = ChatClass::FindChatByLink($chatlink);
         if (!UserChats::find()->where(["user_id" => $userID, "chat_link" => $chatlink])->exists() && $chat->title != ""){
             $chat = new UserChats();
             $chat->user_id = $userID;
             $chat->chat_link = $chatlink;
+            $chat->isadmin = $isadmin;
             $chat->save();
         }
     }
 
-    public static function RemoveUserFromChat($link){
+    /**
+     * Дать пользователю права админу в чате
+     *
+     * @param $chatLink
+     * @param $userID
+     */
+    public static function SetToAdmin($chatLink, $userID){
+        self::RemoveUserFromChat($chatLink, $userID);
+        $chat = new UserChats();
+        $chat->user_id = $userID;
+        $chat->chat_link = $chatLink;
+        $chat->isadmin = 1;
+        $chat->save();
+    }
+
+    /**
+     * Убрать чат из списка пользователя + забрать все права
+     *
+     * @param $link
+     * @param null $userID
+     * @throws \yii\db\Exception
+     */
+    public static function RemoveUserFromChat($link, $userID = null){
+        if ($userID == null) $userID = Yii::$app->user->id;
         if (UserChats::find()->where(["user_id" => \Yii::$app->user->id, "chat_link" => $link])->exists()){
-            Yii::$app->db->createCommand('DELETE FROM `user_chats` WHERE `user_id` = '. \Yii::$app->user->id .' AND `chat_link` = "'. $link .'"')->execute();
+            Yii::$app->db->createCommand('DELETE FROM `user_chats` WHERE `user_id` = '. $userID .' AND `chat_link` = "'. $link .'"')->execute();
         }
     }
+
+    /**
+     * Является ли пользователь админом?
+     *
+     * @param $userID
+     * @param $chatLink
+     * @return mixed
+     */
+    public static function IsAdmin($userID, $chatLink){
+        $chatInfo = UserChats::find()->where([
+            'user_id' => $userID,
+            'chat_link' => $chatLink
+        ])->one();
+        return $chatInfo->attributes["isadmin"];
+    }
+
 }

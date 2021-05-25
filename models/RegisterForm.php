@@ -29,8 +29,7 @@ class RegisterForm  extends Model
     }
 
     /**
-     * Validates the link.
-     * This method serves as the inline validation for password.
+     * Проверяет ссылку
      *
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
@@ -47,7 +46,7 @@ class RegisterForm  extends Model
     }
 
     /**
-     * Logs in a user using the provided username and password.
+     * Регистрирует и авторизует пользователя
      * @return bool whether the user is logged in successfully
      */
     public function register()
@@ -71,7 +70,7 @@ class RegisterForm  extends Model
     }
 
     /**
-     * Finds user by [[username]]
+     * Находит пользователя по никнейму
      *
      * @return User|null
      */
