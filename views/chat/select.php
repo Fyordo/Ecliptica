@@ -90,26 +90,28 @@ $user = Yii::$app->user->identity;
             */
 
             // добавление сообщения самому себе и всему чату
-            if (data.chat === "<?= $chat->link ?>" && data.name === "<?= $user->username ?>"){
+            if (data.chat === "<?= $chat->link ?>"){
                 $nomess.remove();
                 $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
-                $.ajax({
-                    type: 'POST',
-                    url: "http://ecliptica/chat/send",
-                    data: {
-                        "user": null,
-                        "message": data.mess,
-                        "chat": "<?= $chat->link ?>",
-                        "time": data.time,
-                    },
-                    dataType: 'text',
-                    success: function(data){
-                        console.log("Отправлено");
-                    },
-                    error: function(data){
-                        console.log("Ошибка");
-                    }
-                });
+                if (data.name === "<?= $user->username ?>"){
+                    $.ajax({
+                        type: 'POST',
+                        url: "http://ecliptica/chat/send",
+                        data: {
+                            "user": null,
+                            "message": data.mess,
+                            "chat": "<?= $chat->link ?>",
+                            "time": data.time,
+                        },
+                        dataType: 'text',
+                        success: function(data){
+                            console.log("Отправлено");
+                        },
+                        error: function(data){
+                            console.log("Ошибка");
+                        }
+                    });
+                }
             }
         });
     });
