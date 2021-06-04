@@ -90,7 +90,7 @@ $user = Yii::$app->user->identity;
             */
 
             // добавление сообщения самому себе и всему чату
-            if (data.chat === "<?= $chat->link ?>"){
+            if (data.chat === "<?= $chat->link ?>" && data.name === "<?= $user->username ?>"){
                 $nomess.remove();
                 $all_messages.append("<h3 align='left'>" + data.name + " (" + data.time + ")" + "</h3><h4>" + data.mess + "</h3><br>");
                 $.ajax({

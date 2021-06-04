@@ -57,7 +57,6 @@ class RegisterForm  extends Model
             $user->name = $this->username;
             $user->link = $this->link;
             $user->password = $this->password;
-            $user->status = 1;
             $user->save();
             return Yii::$app->user->login($this->getUser(), 3600*24*30);
         }

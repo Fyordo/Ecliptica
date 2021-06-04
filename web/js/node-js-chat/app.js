@@ -24,7 +24,7 @@ io.on('connection', function(socket) {
 
     socket.on('send mess', function(data) {
         if (data.name !== ""){
-            console.log("(" + getDateTime() + ") отправлено сообщение в чат " + data.chat);
+            console.log("(" + getDateTime() + ") отправлено сообщение в чат " + data.chat + " (" + data.name + ")");
             io.emit('add mess', {mess: data.mess, name: data.name, time: getDateTime(), chat: data.chat});
         }
         else{
